@@ -1,5 +1,6 @@
 package com.beachbumtask.server;
 
+import com.beachbumtask.exceptions.InvalidCommandException;
 import com.beachbumtask.math.operations.MathOperation;
 import com.beachbumtask.math.operations.factory.MathOperationFactory;
 
@@ -26,6 +27,7 @@ public class MathOperationsThread extends Thread {
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             out = new PrintWriter(clientSocket.getOutputStream());
             System.out.println("Established client connection");
+            runLivenessPing();
         } catch (IOException e) {
             System.out.println("Failed to initialize connection");
         }
@@ -35,10 +37,6 @@ public class MathOperationsThread extends Thread {
         Arrays.stream(messages).forEach(message ->
             out.println(message)
         );
-        endAndFlushOutput(out);
-    }
-
-    private void endAndFlushOutput(PrintWriter out) {
         out.println("<END>");
         out.flush();
     }
@@ -53,27 +51,33 @@ public class MathOperationsThread extends Thread {
         new Timer().scheduleAtFixedRate(new TimerTask() {
             public void run() {
                 System.out.println("Running liveness");
-                endAndFlushOutput(out);
+                out.println("Still alive!");
+                out.flush();
             }
         }, 0, 60000);
     }
 
     private void eventLoop() {
         while (true) {
-            runLivenessPing();
             try {
                 String unparsedCommand = handleRequest();
                 System.out.println("Received command: " + unparsedCommand);
                 if (QUIT_COMMAND.equalsIgnoreCase(unparsedCommand)) {
                     kill();
                 }
-                final MathOperation mathOperation = MathOperationFactory
-                        .getOperationsFactory()
-                        .getOperation(unparsedCommand);
 
-                sendResponse("your result is: " + mathOperation.perform(unparsedCommand));
+                try {
+                    final MathOperation mathOperation = MathOperationFactory
+                            .getOperationsFactory()
+                            .getOperation(unparsedCommand);
+                    sendResponse("your result is: " + mathOperation.perform(unparsedCommand));
+                } catch (InvalidCommandException e) {
+                    sendResponse(e.getMessage());
+                }
+
             } catch (SocketException e) {
                 this.kill();
+                return;
             } catch (IOException e) {
                 e.printStackTrace();
             }

@@ -1,6 +1,7 @@
 package com.beachbumtask.math.operations.factory;
 
 import com.beachbumtask.enums.Command;
+import com.beachbumtask.exceptions.InvalidCommandException;
 import com.beachbumtask.math.operations.*;
 
 public class MathOperationFactory {
@@ -19,7 +20,7 @@ public class MathOperationFactory {
         return instance;
     }
 
-    public MathOperation getOperation(final String unparsedCommand) {
+    public MathOperation getOperation(final String unparsedCommand) throws InvalidCommandException {
         if (unparsedCommand.contains(Command.ADDITION.getName())) {
             return new Addition();
         }
@@ -37,7 +38,7 @@ public class MathOperationFactory {
             return new Division();
         }
 
-        throw new RuntimeException("Could not parse operation command");
+        throw new InvalidCommandException();
     }
 
 }
