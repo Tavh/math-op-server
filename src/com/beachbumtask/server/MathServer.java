@@ -28,7 +28,7 @@ public class MathServer {
 
     private ServerSocket serverSocket;
     private Socket clientSocket;
-    private final List<MathOperationsThread> mathClientThreads = new ArrayList<>(); // Unused
+    private final List<MathOperationsThread> mathClientThreads = new ArrayList<>();
 
     /**
      * A start function that initializes the server in the specified port, loops while waiting for clients
