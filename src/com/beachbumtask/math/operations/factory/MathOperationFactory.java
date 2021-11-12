@@ -4,6 +4,10 @@ import com.beachbumtask.enums.Command;
 import com.beachbumtask.exceptions.InvalidCommandException;
 import com.beachbumtask.math.operations.*;
 
+/**
+ * A math operation factory class, implementing the factory pattern, responsible
+ * for identifying math operations and creating the right object for them
+ */
 public class MathOperationFactory {
     private MathOperationFactory() {}
 
