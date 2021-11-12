@@ -1,6 +1,6 @@
 package com.beachbumtask.constants;
 
-public class Commands {
+public class ProtocolConstants {
     public static final String QUIT_COMMAND = "quit";
-    public static final String ADDITION_COMMAND = "add";
+    public static final String RESPONSE_END = "<END>";
 }

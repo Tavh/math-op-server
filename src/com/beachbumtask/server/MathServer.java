@@ -6,6 +6,10 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A math operation server class, implements the singleton pattern as only 1 server should exists per application
+ * this class instantiates different threads who handle different clients
+ */
 public class MathServer {
     private MathServer() {}
 
@@ -24,8 +28,12 @@ public class MathServer {
 
     private ServerSocket serverSocket;
     private Socket clientSocket;
-    private final List<MathOperationsThread> mathClientThreads = new ArrayList<>();
+    private final List<MathOperationsThread> mathClientThreads = new ArrayList<>(); // Unused
 
+    /**
+     * A start function that initializes the server in the specified port, loops while waiting for clients
+     * to try to connect, creates a new thread for each new client
+     */
     public void start(int port) {
         try {
             serverSocket = new ServerSocket(port);
@@ -44,5 +52,12 @@ public class MathServer {
             socketWrappingThread.start();
             mathClientThreads.add(socketWrappingThread);
         }
+    }
+
+    /**
+     * A stop function that kills all threads in the server before shutting down the server (unused as of now)
+     */
+    public void stop() {
+        mathClientThreads.forEach(MathOperationsThread::kill);
     }
 }

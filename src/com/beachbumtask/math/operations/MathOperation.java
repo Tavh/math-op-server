@@ -2,6 +2,10 @@ package com.beachbumtask.math.operations;
 
 import com.beachbumtask.enums.Command;
 
+/**
+ * A math operation abstract class that implements a perform method that parses commands from the user
+ * it's members should implement the actual calculation of the inputs from the user
+ */
 public abstract class MathOperation {
     final public double perform(String unparsedCommand) {
         StringBuilder firstNumStr = new StringBuilder();
@@ -24,7 +28,7 @@ public abstract class MathOperation {
     }
 
     private int getFirstNumberIndex() {
-        return  getCommand().getName().length() + 2;
+        return getCommand().getName().length() + 2;
     }
 
     protected abstract Command getCommand();

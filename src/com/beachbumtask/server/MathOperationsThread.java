@@ -11,8 +11,12 @@ import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import static com.beachbumtask.constants.Commands.QUIT_COMMAND;
+import static com.beachbumtask.constants.ProtocolConstants.QUIT_COMMAND;
+import static com.beachbumtask.constants.ProtocolConstants.RESPONSE_END;
 
+/**
+ * A math operation thread, designed to provide services for a single math operation client
+ */
 public class MathOperationsThread extends Thread {
     private final Socket clientSocket;
     private BufferedReader in;
@@ -22,6 +26,9 @@ public class MathOperationsThread extends Thread {
         this.clientSocket = clientSocket;
     }
 
+    /**
+     * An init function that establishes the i/o of the agent and starts the liveness timer
+     */
     private void init() {
         try {
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
@@ -33,20 +40,30 @@ public class MathOperationsThread extends Thread {
         }
     }
 
+    /**
+     * @param messages an indefinite number of messages to the client
+     */
     private void sendResponse(String... messages) {
         Arrays.stream(messages).forEach(message ->
             out.println(message)
         );
-        out.println("<END>");
+        out.println(RESPONSE_END);
         out.flush();
     }
 
+    /**
+     * Waits for requests for the client
+     * @return a command from the client
+     */
     private String handleRequest() throws IOException{
         String line;
         while((line = in.readLine()).equals("")) {}
         return line;
     }
 
+    /**
+     * Starts a scheduled task that sends a liveness to the client every 60 seconds
+     */
     private void runLivenessPing() {
         new Timer().scheduleAtFixedRate(new TimerTask() {
             public void run() {
@@ -57,15 +74,16 @@ public class MathOperationsThread extends Thread {
         }, 0, 60000);
     }
 
+    /**
+     * The main loop of the client, keeps getting requests from the client, parsing them into commands, performing
+     * operations and sending a response
+     */
     private void eventLoop() {
         while (true) {
             try {
                 String unparsedCommand = handleRequest();
                 System.out.println("Received command: " + unparsedCommand);
-                if (QUIT_COMMAND.equalsIgnoreCase(unparsedCommand)) {
-                    kill();
-                }
-
+                if (QUIT_COMMAND.equalsIgnoreCase(unparsedCommand)) { kill(); }
                 try {
                     final MathOperation mathOperation = MathOperationFactory
                             .getOperationsFactory()
@@ -83,12 +101,17 @@ public class MathOperationsThread extends Thread {
             }
         }
     }
-
+    /**
+     * Kills the thread, ending the connection with the client
+     */
     public void kill() {
         System.out.println("Client connection closed");
         this.interrupt();
     }
 
+    /**
+     * An override of the Thread.run method, initializes the agent and starts the event loop
+     */
     @Override
     public void run() {
         init();
