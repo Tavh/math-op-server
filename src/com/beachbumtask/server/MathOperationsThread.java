@@ -78,7 +78,7 @@ public class MathOperationsThread extends Thread {
                 System.out.println("Running liveness");
                 sendInfo("Still alive");
             }
-        }, 0, 10000);
+        }, 0, 60000);
     }
 
     /**
