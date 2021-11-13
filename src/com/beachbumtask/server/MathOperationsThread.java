@@ -51,6 +51,14 @@ public class MathOperationsThread extends Thread {
         out.flush();
     }
 
+    private void sendInfo(String... messages) {
+        Arrays.stream(messages).forEach(message ->
+                out.println("INFO: " + message)
+        );
+        out.println(RESPONSE_END);
+        out.flush();
+    }
+
     /**
      * Waits for requests for the client
      * @return a command from the client
@@ -68,10 +76,9 @@ public class MathOperationsThread extends Thread {
         new Timer().scheduleAtFixedRate(new TimerTask() {
             public void run() {
                 System.out.println("Running liveness");
-                out.println("Still alive!");
-                out.flush();
+                sendInfo("Still alive");
             }
-        }, 0, 60000);
+        }, 0, 10000);
     }
 
     /**
